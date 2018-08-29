@@ -4,32 +4,40 @@
 #                          https://github.com/dznet
 #-------------------------------------------------------------------------------
 from sys import argv
+from sys import exc_info
 from requests import Session
 from json import loads
 
 def easypay_tx_status():
 
-  txid = argv[1] if len(argv) > 1 else print('Missing Transaction ID')
+  try:
+    if len(argv) > 1:
 
-  data = {'inputData':txid}
+      data = {'inputData':argv[1]}
 
-  endpoint = 'https://partners.easypay.ua/main/GetTransactionStatus'
+      endpoint = 'https://partners.easypay.ua/main/GetTransactionStatus'
 
-  headers = {'User-Agent':'Mozilla/5.0 (dzNET; Linux-4.18.4) +https://t.me/dznet',
-             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+      headers = {'User-Agent':'Mozilla/5.0 (dzNET; Linux-4.18.4) +https://t.me/dznet',
+                 'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
 
-  proxy = {'https':'socks5://localhost:9050'}
+      proxy = {'https':'socks5://localhost:9050'}
 
-  session = Session()
+      session = Session()
 
-  response = session.post(endpoint, proxies=proxy, headers=headers, data=data)
-  
-  tx = loads(response.content)
+      response = session.post(endpoint, proxies=proxy, headers=headers, data=data)
 
-  tx['receiptContent'] = tx['receiptContent'].replace('<b>', '').replace('</b>', '')
-  tx['receiptContent'] = tx['receiptContent'].replace('<br>', '\n')
+      tx = loads(response.content)
 
-  return tx['receiptStatus'], tx['receiptContent']
+      tx['receiptContent'] = tx['receiptContent'].replace('<b>', '').replace('</b>', '')
+      tx['receiptContent'] = tx['receiptContent'].replace('<br>', '\n')
+
+      return tx['receiptStatus'], tx['receiptContent']
+    else:
+      return 'Missing Transaction ID', 'Example: easy 44444444'
+  except:
+    info = exc_info()
+    error = '{}\n{}'.format(info[0], info[1])
+    return 'Error:', error
 
 #---------------------------------------------------------------------------------
 status, content = easypay_tx_status()
