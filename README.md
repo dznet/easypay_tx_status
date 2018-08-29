@@ -38,3 +38,10 @@
   ------------------------------------
   Дякуємо, що обрали нас!
 ```
+### Installation
+```
+  virtualenv -p /usr/bin/python3.6 .env/
+  source .env/bin/activate
+  pip install -r requirements.txt
+  echo "alias easy='"$PATH_TO_SCRIPT"'" >> ~/.bash_aliases
+```
