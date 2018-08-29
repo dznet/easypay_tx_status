@@ -1,0 +1,39 @@
+#!/usr/bin/env python3.6
+################################################################################
+#                          Easypay TX by ID v.0.0.2
+#                          https://github.com/dznet
+#-------------------------------------------------------------------------------
+from sys import argv
+from requests import Session
+from json import loads
+
+def easypay_tx_status():
+
+  txid = argv[1] if len(argv) > 1 else print('Missing Transaction ID')
+
+  data = {'inputData':txid}
+
+  endpoint = 'https://partners.easypay.ua/main/GetTransactionStatus'
+
+  headers = {'User-Agent':'Mozilla/5.0 (dzNET; Linux-4.18.4) +https://t.me/dznet',
+             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+
+  proxy = {'https':'socks5://localhost:9050'}
+
+  session = Session()
+
+  response = session.post(endpoint, proxies=proxy, headers=headers, data=data)
+  
+  tx = loads(response.content)
+
+  tx['receiptContent'] = tx['receiptContent'].replace('<b>', '').replace('</b>', '')
+  tx['receiptContent'] = tx['receiptContent'].replace('<br>', '\n')
+
+  return tx['receiptStatus'], tx['receiptContent']
+
+#---------------------------------------------------------------------------------
+status, content = easypay_tx_status()
+
+print('\n{0} {1} {0}\n\n{2}'.format('#' * 14, status, content))
+
+##################################################################################
